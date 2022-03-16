@@ -17,8 +17,11 @@ from django.contrib import admin
 from django.urls import path,include
 from dashboard import views
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    
     path('',views.home,name='home'),
+    path('buyer/', include('buyer.urls')),
+
+    path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', views.SignUpView.as_view(), name='signup'),
 

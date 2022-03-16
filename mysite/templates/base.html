@@ -22,11 +22,11 @@
         <div class="col-md-10 col-sm-12">
           <div class="row">
             <div class="col-6">
-              <h1 class="logo">
+              <h2 class="logo">
                 <a href="{% url 'home' %}">
-                  Home
+                  Shop
                 </a>
-              </h1>
+              </h2>
             </div>
             <div class="col-6 text-right">
               {% if user.is_authenticated %}
@@ -45,6 +45,20 @@
             </div>
           </div>
           <div class="card mb-3">
+            {% if user.is_authenticated %}
+            {% url 'buyer:entry' as buyerentry %}
+            <div class="card-header">
+              <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                  <a class="nav-link{% if buyerentry in request.path  %} active{% endif %}" href="{{buyerentry}}">Buyer</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Seller</a>
+                </li>
+                
+                </ul>
+            </div>
+            {% endif %}
             <div class="card-body">
               {% for message in messages %}
                 <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">

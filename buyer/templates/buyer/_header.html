@@ -1,0 +1,13 @@
+
+<ul class="nav nav-pills mb-3">  
+    <li class="nav-item">
+        <a class="nav-link{% if active == 'entry' %} active{% endif %}" href="{% url 'buyer:entry' %}">Entry</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active == 'entry_list' %} active{% endif %}" href="{% url 'buyer:entrylist' %}">List</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active == 'buyers' %} active{% endif %}" href="{% url 'buyer:buyers' %}">Buyers</a>
+    </li>
+    
+</ul>
