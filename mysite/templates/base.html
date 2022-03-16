@@ -31,7 +31,7 @@
             <div class="col-6 text-right">
               {% if user.is_authenticated %}
                 <p class="pt-3">
-                  {% if user.is_student %}
+                  {% if user.is_buyer %}
                     <strong><a href="#">{{ user.username }}</a> - {{user.student.score}}</strong>
                   {% else %}
                     <strong>{{ user.username }}</strong>
