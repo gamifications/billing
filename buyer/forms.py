@@ -34,5 +34,6 @@ class BuyerForm(forms.ModelForm):
                 Column('aadhar_number', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
+            'photo',
             Submit('submit', 'Add New Buyer')
         )

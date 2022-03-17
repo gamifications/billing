@@ -1,3 +1,4 @@
+from distutils.command.upload import upload
 from unicodedata import name
 from django.db import models
 
@@ -15,5 +16,5 @@ class Buyer(models.Model):
     reference_name= models.CharField(max_length=100)
     aadhar_number= models.CharField(max_length=100)
     # date_of_entered
-    # photo
+    photo=models.ImageField()
     

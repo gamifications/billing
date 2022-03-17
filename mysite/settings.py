@@ -151,13 +151,16 @@ STATICFILES_DIRS = [
     BASE_DIR / 'mysite' / 'static',
 ]
 
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+
 # Custom Django auth settings
 AUTH_USER_MODEL = 'dashboard.User'
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'buyer:entry'
+LOGOUT_REDIRECT_URL = 'login'
 
 
 # Messages built-in framework

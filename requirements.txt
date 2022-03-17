@@ -4,3 +4,4 @@ python-decouple==3.4
 psycopg2==2.8.6
 
 whitenoise
+pillow

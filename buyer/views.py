@@ -10,7 +10,7 @@ from buyer.models import Buyer
 @login_required
 def buyers_view(request):
     if request.method == 'POST':
-        form = BuyerForm(request.POST)
+        form = BuyerForm(request.POST, request.FILES)
         if form.is_valid():
             buyer = form.save(commit=False)
             # buyer.school = request.user.school

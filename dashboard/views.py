@@ -27,4 +27,6 @@ class SignUpView(CreateView):
 
 @login_required
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('buyer:entry')
     return render(request, 'home.html')
