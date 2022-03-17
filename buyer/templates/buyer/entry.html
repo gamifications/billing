@@ -1,16 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'buyer/base.html' %}
 
+{% load crispy_forms_tags %}
 
 {% block content %}
 {% include 'buyer/_header.html' with active='entry' %}
 
 <div class="row">
-  <div class="col-12 col-md-8">
+  <div class="col-12 col-md-10">
     <div class="card">
       <div class="card-body">
-        <h1> Entry</h1>
+        {% crispy form %}
+        
+        <hr>
+        <table id="buyerentrylist" class="table table-sm table-bordered dt-responsive nowrap compact" style="width:100%">
+          <thead>
+            <tr> <th scope="col">SL</th><th scope="col">Buyer</th> 
+              <th>Product</th></tr>
+          </thead>
+          <tbody>
+            {% for entry in buyerentries %}
+            <tr><td scope="row">{{forloop.counter}}</td>
+              <td>{{entry.buyer.name}}</td> <td>{{entry.product.name}}</td>
+              
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
+
+{% block extrajs %}
+  <script type="text/javascript">
+  $(document).ready(function() {
+      $('#buyerentrylist').DataTable({
+      "pageLength": 10,
+      dom: 'Bfrtip',
+          buttons: [
+              'copy', 'csv', 'excel', 'pdf', 'print'
+          ]
+      });
+  });
+  </script>
+  {% endblock %}

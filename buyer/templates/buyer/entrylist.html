@@ -1,20 +1,65 @@
-{% extends 'base.html' %}
-
-{% load static %}
-{% load crispy_forms_tags %}
-
-{% block extracss %}
-<link rel="stylesheet" type="text/css" href="{% static 'datatables/dataTables.bootstrap4.min.css' %}">
-{% endblock %}
+{% extends 'buyer/base.html' %}
 
 {% block content %}
 {% include 'buyer/_header.html' with active='entry_list' %}
 
 <div class="row">
-  <div class="col-12 col-md-8">
+  <div class="col-12 col-md-10">
     <div class="card">
       <div class="card-body">
-        <h1> Entry List</h1>
+        <form method="get" action=".">
+          <div class="form-group row">
+            <label for="buyername" class="col-sm-4 col-form-label">Search by Buyer Name</label>
+            <div class="col-sm-6">
+              <select class="form-control" id="buyername" name="buyer">
+                <option value="">-- select --</option>
+                {% for buyer in buyers %}<option value="{{buyer.id}}"
+                  {% if buyer.id == att_buyer %} selected{% endif %}>{{buyer.name}}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="productname" class="col-sm-4 col-form-label">Search by Product Name</label>
+            <div class="col-sm-6">
+              <select class="form-control" id="productname" name="product">
+                <option value="">-- select --</option>
+                {% for product in products %}<option value="{{product.id}}"
+                  {% if product.id == att_product %} selected{% endif %}>{{product.name}}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="date" class="col-sm-4 col-form-label">Search by Date Range</label>
+            <div class="col-sm-6">
+              <select class="form-control" id="productname" name="product">
+                <option value="">-- select --</option>
+                <option value="today">Today</option>
+                <option value="week">1 Week</option>
+                <option value="month">1 Month</option>
+                <option value="half">6 Month</option>
+                <option value="year">1 Year</option>
+                </select>
+            </div>
+          </div>
+          <input type="submit" class="btn btn-primary" value="Search Entries">
+        </form>
+        
+        <hr>
+        <table id="buyersearchlist" class="table table-sm table-bordered dt-responsive nowrap compact" style="width:100%">
+          <thead>
+            <tr> <th scope="col">SL</th><th scope="col">Buyer</th> 
+              <th>Product</th></tr>
+          </thead>
+          <tbody>
+            {% for entry in results %}
+            <tr><td scope="row">{{forloop.counter}}</td>
+              <td>{{entry.buyer.name}}</td> <td>{{entry.product.name}}</td>
+              
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p class="lead">Total: {{total}}.00 Rs</p>
       </div>
     </div>
   </div>
@@ -22,13 +67,13 @@
 {% endblock %}
 
 {% block extrajs %}
-<script src="{% static 'datatables/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'datatables/dataTables.bootstrap4.min.js' %}"></script>
 <script type="text/javascript">
+  
 $(document).ready(function() {
-    $('#clasroomlist').DataTable({
+    $('#buyersearchlist').DataTable({
       "pageLength": 50
     });
+    
 });
 </script>
 {% endblock %}
