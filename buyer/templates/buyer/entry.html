@@ -2,6 +2,11 @@
 
 {% load crispy_forms_tags %}
 
+{% load static %}
+{% block extracss %}
+<link href="{% static 'select2/select2.min.css' %}" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
 {% include 'buyer/_header.html' with active='entry' %}
 
@@ -47,8 +52,12 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'select2/select2.min.js' %}"></script>
   <script type="text/javascript">
   $(document).ready(function() {
+    $("#id_buyer").select2();
+    $("#id_product").select2();
+
       $('#buyerentrylist').DataTable({
       "pageLength": 10,
       dom: 'Bfrtip',
@@ -59,3 +68,4 @@
   });
   </script>
   {% endblock %}
+
