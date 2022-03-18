@@ -1,5 +1,6 @@
 from distutils.command.upload import upload
 from operator import mod
+from pyexpat import model
 from unicodedata import name
 from django.db import models
 
@@ -18,6 +19,8 @@ class Buyer(models.Model):
     aadhar_number= models.CharField(max_length=100)
     date_of_entered = models.DateTimeField(auto_now_add=True)
     photo=models.ImageField()
+    email_notifications = models.BooleanField(default=False)
+    sms_notifications = models.BooleanField(default=False)
     def __str__(self) -> str:
         return self.name
 

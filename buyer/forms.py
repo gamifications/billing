@@ -35,6 +35,8 @@ class BuyerForm(forms.ModelForm):
                 css_class='form-row'
             ),
             'photo',
+            'email_notifications',
+            'sms_notifications',
             Submit('submit', 'Add New Buyer')
         )
 
@@ -74,5 +76,5 @@ class BuyerEntryForm(forms.ModelForm):
                 Column('labour_commn', css_class='form-group col-md-3 mb-0'),
                 css_class='form-row'
             ),
-            Submit('submit', 'Add New Buyer Entry')
+            Submit('submit', 'Add Entry')
         )

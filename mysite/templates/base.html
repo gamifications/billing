@@ -28,6 +28,7 @@
           <div class="card mb-3">
             {% if user.is_authenticated %}
             {% url 'buyer:entry' as buyerentry %}
+            {% url 'dashboard:products' as product_url %}
             <div class="card-header">
               <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
@@ -35,6 +36,9 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="#">Seller</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link{% if product_url in request.path  %} active{% endif %}" href="{{product_url}}">Products</a>
                 </li>
                 
                 </ul>

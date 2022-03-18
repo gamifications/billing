@@ -3,10 +3,12 @@ from django.db import transaction
 from django import forms
 from django.contrib.auth import get_user_model
 
+from dashboard.models import Product
+
 User = get_user_model()
 
 class SignUpForm(UserCreationForm):
-    CHOICES=[('buyer','Buyer'),('seller','Seller')]
+    CHOICES=[('admin','Admin'),('biller','Biller')]
     usertype = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
     email = forms.EmailField(required=True)
     class Meta(UserCreationForm.Meta):
@@ -17,9 +19,14 @@ class SignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         usertype= self.cleaned_data.get('usertype')
-        if usertype == 'buyer':
-            user.is_buyer = True
-        else:
-            user.is_seller = True
+        if usertype == 'admin':
+            user.is_staff = True
         user.save()
         return user
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = '__all__' #('name', )
+    
+    

@@ -23,7 +23,7 @@ urlpatterns = [
     
     path('',views.home,name='home'),
     path('buyer/', include('buyer.urls')),
-
+    path('dashboard/', include('dashboard.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', views.SignUpView.as_view(), name='signup'),

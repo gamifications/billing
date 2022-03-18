@@ -4,13 +4,14 @@ from django.shortcuts import render
 
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
-
+from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from django.views.generic import CreateView
-from .forms import SignUpForm
+from .forms import SignUpForm, ProductForm
+from .models import Product
 
 User = get_user_model()
 
@@ -30,3 +31,20 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('buyer:entry')
     return render(request, 'home.html')
+
+
+@login_required
+def products_view(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.save()
+            messages.success(request, 'Product saved with success!')
+            return redirect('dashboard:products')
+    else:
+        form = ProductForm()
+
+    products = Product.objects.all()
+    return render(request,"dashboard/products.html", {'form': form, 'products':products })
+
