@@ -23,6 +23,7 @@ class Buyer(models.Model):
         return self.name
 
 class BuyerEntry(models.Model):
+    billnumber= models.BigIntegerField()
     buyer=models.ForeignKey('Buyer', on_delete=models.CASCADE)
     payment_mode= models.CharField(max_length=100)
     date_of_entered = models.DateTimeField(auto_now_add=True)

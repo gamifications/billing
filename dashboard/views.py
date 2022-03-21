@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from django.views.generic import CreateView
+from django.db.models import Count
 from .forms import SignUpForm, ProductForm
 from .models import Product
 
@@ -45,6 +46,6 @@ def products_view(request):
     else:
         form = ProductForm()
 
-    products = Product.objects.all()
+    products = Product.objects.annotate(stock=Count('buyerentryitems'))
     return render(request,"dashboard/products.html", {'form': form, 'products':products })
 

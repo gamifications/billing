@@ -102,7 +102,7 @@
       let data = {
         'buyerid':$("#id_buyer").val(),
         'paymentmode':$("#id_payment_mode").val(),
-        'items':items
+        'items':JSON.stringify(items)
       };
       if(data['buyerid'] && data['paymentmode']&& items.length>0) {
         $.ajax({
