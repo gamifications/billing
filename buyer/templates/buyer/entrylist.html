@@ -21,16 +21,16 @@
               <th>Bill ID</th>
               <th>Date</th>
               <th>Buyer</th> 
-              <th>Payment Method</th>
+              <th>Total</th>
             </tr>
           </thead>
           <tbody>
             {% for entry in results %}
             <tr>
-              <td scope="row">#{{entry.billnumber}}</td>
+              <td scope="row"> <button type="button" class="btn btn-sm btn-warning"  onclick="generatePDF('{{entry.id}}')">#{{entry.billnumber}}</button></td>
               <td>{{entry.date_of_entered|date:"SHORT_DATE_FORMAT"}}</td> 
               <td>{{entry.buyer.name}}</td> 
-              <td>{{entry.payment_mode}}({{entry.total}}.00rs)</td>
+              <td>{{entry.total}}.00rs({{entry.payment_mode|upper}}) </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -39,7 +39,7 @@
                 <th>Bill ID</th>
                 <th>Date</th>
                 <th>Buyer</th>
-                <th>Payment Method</th>
+                <th>Total</th>
             </tr>
           </tfoot>
         </table>
@@ -50,16 +50,23 @@
 {% block js %}
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
-  
+  function generatePDF(entry_id) {
+    $.get("/buyer/generate_pdf/", { entry: entry_id } )
+    .done(function( resp ) {
+      window.open(resp, '_blank');
+    });
+
+  }
 $(document).ready(function() {
   
   $('#buyersearchlist tfoot th').each( function () {
       var title = $(this).text();
-      $(this).html( '<input style="width:100px" type="text" placeholder="Search '+title+'" />' );
+      $(this).html( '<input class="form-control" placeholder="Search '+title+'" />' );
   } );
  
   $('#buyersearchlist').DataTable({
       "pageLength": 10,
+      sDom: 'lrtip',
       "order": [[ 0, "desc" ]],
       initComplete: function () {
         // Apply the search

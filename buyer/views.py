@@ -1,12 +1,13 @@
-
-
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum, Max
+from django.db.models import Sum, Max, F
+import json
 
 
+
+from buyer.pdf import GeneratePDF
 from buyer.forms import BuyerForm, BuyerEntryForm
 from buyer.models import Buyer, BuyerEntry, BuyerEntryItems
 
@@ -19,16 +20,15 @@ def buyers_view(request):
             buyer.save()
             messages.success(request, 'Buyer saved with success!')
             return redirect('buyer:entry')
-    # else:
-    #     form = BuyerForm()
 
-    # buyers = Buyer.objects.all()
-    # return render(request,"buyer/buyers.html", {'form': form, 'buyers':buyers })
-
+def generate_pdf(entry, req):
+    pdf_gen = GeneratePDF(req.build_absolute_uri('/')[:-1]) # request.get_host()
+    pdf_gen.generate(entry,BuyerEntryItems.objects.filter(buyer_entry=entry))
+    return pdf_gen.url
 
 @login_required
 def entry_view(request):
-    import json
+    
     if request.method == 'POST':
         billno = BuyerEntry.objects.aggregate(n=Max('billnumber'))['n'] or 10000
         entry=BuyerEntry.objects.create(
@@ -36,7 +36,8 @@ def entry_view(request):
             buyer_id=request.POST['buyerid'],
             payment_mode=request.POST['paymentmode']
         )
-        for item in json.loads(request.POST['items']):
+        items = json.loads(request.POST['items'])
+        for item in items:
             BuyerEntryItems.objects.create(
                 buyer_entry=entry,
                 labour_commn=item['labour'],
@@ -45,11 +46,18 @@ def entry_view(request):
                 unit_price=item['unitprice'],
             )
         
+        
         messages.success(request, 'Entry saved with success!')
-        return HttpResponse('success')
+        pdf_url = generate_pdf(entry,request)
+        return HttpResponse(pdf_url)
     return render(request,"buyer/entry.html", {'form': BuyerEntryForm(), 'buyers':Buyer.objects.all(), 'buyer_form': BuyerForm()})
+
+def ajax_pdf(request):
+    entry=BuyerEntry.objects.get(id=request.GET['entry'])
+    pdf_url = generate_pdf(entry,request)
+    return HttpResponse(pdf_url)
 
 @login_required
 def entrylist_view(request):
-    qs = BuyerEntry.objects.all()
-    return render(request,"buyer/entrylist.html",{'results':qs.annotate(total=Sum('buyerentryitems__unit_price'))})
+    qs = BuyerEntry.objects.annotate(total=Sum(F('buyerentryitems__unit_price')+F('buyerentryitems__labour_commn')))
+    return render(request,"buyer/entrylist.html",{'results':qs})

@@ -113,6 +113,7 @@
               xhr.setRequestHeader("X-CSRFToken",'{{ csrf_token }}');
           },
         }).done(function (resp) {
+          window.open(resp, '_blank');
           // refresh 
           location.reload();
         });
