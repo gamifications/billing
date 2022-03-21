@@ -1,8 +1,10 @@
 from django import forms
+from django.db.models import Count, F
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, HTML
 
-from seller.models import Seller
+from seller.models import Seller, SellerEntryItems
+from buyer.models import BuyerEntryItems
 from dashboard.models import Product
 class SellerForm(forms.ModelForm):
     class Meta:
@@ -52,7 +54,12 @@ UNITTYPES = (
 
 
 class SellerEntryForm(forms.Form):
-    product = forms.ModelChoiceField(queryset=Product.objects.all())
+    product = forms.ModelChoiceField(
+        queryset=Product.objects.annotate(
+            t_buy=Count('buyerentryitems',distinct=True),
+            t_sell=Count('sellerentryitems',distinct=True)
+        ).annotate(stock=F('t_buy')-F('t_sell')).filter(stock__gt=0)
+    )
     unit_price = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Unit Price'}))
     unit_type = forms.ChoiceField(choices=UNITTYPES)
     labour_commn = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Labour charge'}))
