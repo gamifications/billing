@@ -1,8 +1,9 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column
+from crispy_forms.layout import Layout, Submit, Row, Column, HTML
 
-from buyer.models import Buyer, BuyerEntry
+from buyer.models import Buyer
+from dashboard.models import Product
 class BuyerForm(forms.ModelForm):
     class Meta:
         model = Buyer
@@ -11,6 +12,7 @@ class BuyerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
+        self.helper.form_action = '/buyer/buyers/'
         self.helper.layout = Layout(
             Row(
                 Column('name', css_class='form-group col-md-6 mb-0'),
@@ -47,34 +49,24 @@ UNITTYPES = (
     ('bag', 'Bags'),
     ('katta', 'Katta')
 )
-PAYMENTMODES = (
-    ('', 'Choose...'),
-    ('cash', 'Cash'),
-    ('credit', 'Credit'),
-    ('upi', 'UPI')
-)
-class BuyerEntryForm(forms.ModelForm):
+
+
+class BuyerEntryForm(forms.Form):
+    product = forms.ModelChoiceField(queryset=Product.objects.all())
+    unit_price = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Unit Price'}))
     unit_type = forms.ChoiceField(choices=UNITTYPES)
-    payment_mode = forms.ChoiceField(choices=PAYMENTMODES)
-    class Meta:
-        model = BuyerEntry
-        fields = '__all__' #('name', )
+    labour_commn = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Labour charge'}))
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Row(
-                Column('buyer', css_class='form-group col-md-6 mb-0'),
-                Column('product', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
-            ),
-            Row(
-                Column('unit_type', css_class='form-group col-md-3 mb-0'),
+                Column('product', css_class='form-group col-md-3 mb-0'),
                 Column('unit_price', css_class='form-group col-md-3 mb-0'),
-                Column('payment_mode', css_class='form-group col-md-3 mb-0'),
+                Column('unit_type', css_class='form-group col-md-3 mb-0'),
                 Column('labour_commn', css_class='form-group col-md-3 mb-0'),
                 css_class='form-row'
             ),
-            Submit('submit', 'Add Entry')
+            Submit('submit', 'Add Item')
         )

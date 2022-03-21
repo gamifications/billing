@@ -1,7 +1,5 @@
-from distutils.command.upload import upload
-from operator import mod
-from pyexpat import model
-from unicodedata import name
+
+
 from django.db import models
 
 # Create your models here.
@@ -26,9 +24,12 @@ class Buyer(models.Model):
 
 class BuyerEntry(models.Model):
     buyer=models.ForeignKey('Buyer', on_delete=models.CASCADE)
+    payment_mode= models.CharField(max_length=100)
+    date_of_entered = models.DateTimeField(auto_now_add=True)
+
+class BuyerEntryItems(models.Model):
+    buyer_entry = models.ForeignKey('BuyerEntry', on_delete=models.CASCADE)
+    labour_commn= models.IntegerField()
     product = models.ForeignKey('dashboard.Product', on_delete=models.CASCADE)
     unit_type= models.CharField(max_length=100)
     unit_price= models.IntegerField()
-    payment_mode= models.CharField(max_length=100)
-    labour_commn= models.IntegerField()
-    date_of_entered = models.DateTimeField(auto_now_add=True)
