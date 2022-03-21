@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+<style>
+  tfoot input {
+  box-sizing: border-box;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'seller/_header.html' with active='entry_list' %}
+
+    <div class="card">
+      <div class="card-body">
+        <table id="sellersearchlist" class="display" style="width:100%">
+          <thead>
+            <tr> 
+              <th>Bill ID</th>
+              <th>Date</th>
+              <th>Seller</th> 
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in results %}
+            <tr>
+              <td scope="row"> <button type="button" class="btn btn-sm btn-warning"  onclick="generatePDF('{{entry.id}}')">#{{entry.billnumber}}</button></td>
+              <td>{{entry.date_of_entered|date:"SHORT_DATE_FORMAT"}}</td> 
+              <td>{{entry.seller.name}}</td> 
+              <td>{{entry.total}}.00rs({{entry.payment_mode|upper}}) </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+                <th>Bill ID</th>
+                <th>Date</th>
+                <th>seller</th>
+                <th>Total</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+  function generatePDF(entry_id) {
+    $.get("/seller/generate_pdf/", { entry: entry_id } )
+    .done(function( resp ) {
+      window.open(resp, '_blank');
+    });
+
+  }
+$(document).ready(function() {
+  
+  $('#sellersearchlist tfoot th').each( function () {
+      var title = $(this).text();
+      $(this).html( '<input class="form-control" placeholder="Search '+title+'" />' );
+  } );
+ 
+  $('#sellersearchlist').DataTable({
+      "pageLength": 10,
+      sDom: 'lrtip',
+      "order": [[ 0, "desc" ]],
+      initComplete: function () {
+        // Apply the search
+        this.api().columns().every( function () {
+            var that = this;
+            $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                if ( that.search() !== this.value ) {
+                    that.search( this.value ).draw();
+                }
+            } );
+        } );
+                
+        var r = $('#sellersearchlist tfoot tr');
+        
+        $('#sellersearchlist thead').append(r);
+        $('#search_0').css('text-align', 'center');
+      },
+          
+  });
+    
+});
+</script>
+{% endblock %}
+
+
