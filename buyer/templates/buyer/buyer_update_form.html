@@ -1,0 +1,8 @@
+{% load crispy_forms_tags %}
+<form method="post" enctype='multipart/form-data' 
+    action="{% url 'buyer:buyer-update' buyerid %}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success">Update Buyer </button>
+
+</form>

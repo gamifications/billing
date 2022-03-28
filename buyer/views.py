@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Max, F
+from django.views.generic.edit import UpdateView
+from django.template.loader import render_to_string
+
 import json
 
 
@@ -20,6 +23,26 @@ def buyers_view(request):
             buyer.save()
             messages.success(request, 'Buyer saved with success!')
             return redirect('buyer:entry')
+
+class BuyerUpdateView(UpdateView):
+    model = Buyer
+    form_class = BuyerForm
+    template_name_suffix = '_update_form'
+from django.middleware import csrf
+def buyer_update_view(request,pk):
+    item= Buyer.objects.get(id=pk)
+    if request.method =='POST':
+        form = BuyerForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Buyer saved with success!')
+            return redirect('buyer:entry')
+    form = BuyerForm(instance=item)
+
+    return HttpResponse(
+        render_to_string('buyer/buyer_update_form.html', 
+        {'form':form,'buyerid':pk,'csrf_token': csrf.get_token(request)}))
+    
 
 def generate_pdf(entry, req):
     pdf_gen = GeneratePDF(req.build_absolute_uri('/')[:-1]) # request.get_host()

@@ -1,5 +1,4 @@
 
-
 from django.db import models
 
 # Create your models here.
@@ -34,3 +33,4 @@ class BuyerEntryItems(models.Model):
     product = models.ForeignKey('dashboard.Product', on_delete=models.CASCADE)
     unit_type= models.CharField(max_length=100)
     unit_price= models.IntegerField()
+    hamail= models.IntegerField()
