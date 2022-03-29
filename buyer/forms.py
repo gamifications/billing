@@ -56,7 +56,7 @@ class BuyerEntryForm(forms.Form):
     unit_price = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Unit Price'}))
     unit_type = forms.ChoiceField(choices=UNITTYPES)
     labour_commn = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Labour charge'}))
-    hamail = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Hamali'}))
+    hamali = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Hamali'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,13 +66,11 @@ class BuyerEntryForm(forms.Form):
                 Column('product', css_class='form-group col-md-6 mb-0'),
                 Column('unit_type', css_class='form-group col-md-3 mb-0'),
                 Column('unit_price', css_class='form-group col-md-3 mb-0'),
-                
                 css_class='form-row'
             ),
             Row(
-                Column('hamail', css_class='form-group col-md-3 mb-0'),
+                Column('hamali', css_class='form-group col-md-3 mb-0'),
                 Column('labour_commn', css_class='form-group col-md-3 mb-0'),
-                
                 css_class='form-row'
             ),
             Submit('submit', 'Add Item')

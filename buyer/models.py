@@ -7,7 +7,7 @@ class Buyer(models.Model):
     name= models.CharField(max_length=100)
     father_name= models.CharField(max_length=100)
     mobile1= models.CharField(max_length=100)
-    mobile2= models.CharField(max_length=100)
+    mobile2= models.CharField(max_length=100, blank=True)
     address= models.CharField(max_length=100)
     email= models.EmailField(blank=True)
     state= models.CharField(max_length=100)
@@ -26,6 +26,7 @@ class BuyerEntry(models.Model):
     buyer=models.ForeignKey('Buyer', on_delete=models.CASCADE)
     payment_mode= models.CharField(max_length=100)
     date_of_entered = models.DateTimeField(auto_now_add=True)
+    date_of_purchase = models.DateField(null=True)
 
 class BuyerEntryItems(models.Model):
     buyer_entry = models.ForeignKey('BuyerEntry', on_delete=models.CASCADE)
@@ -33,4 +34,12 @@ class BuyerEntryItems(models.Model):
     product = models.ForeignKey('dashboard.Product', on_delete=models.CASCADE)
     unit_type= models.CharField(max_length=100)
     unit_price= models.IntegerField()
-    hamail= models.IntegerField()
+    hamali= models.IntegerField()
+
+class Accounting(models.Model):
+    buyer=models.ForeignKey('Buyer', on_delete=models.CASCADE)
+    is_credit = models.BooleanField(default=False)
+    date_of_entered = models.DateTimeField(auto_now_add=True)
+    # balance = models.IntegerField()
+    amount = models.IntegerField()
+

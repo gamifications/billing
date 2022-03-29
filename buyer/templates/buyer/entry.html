@@ -32,15 +32,7 @@
         </div>
        
       </div>
-      <div class="row mb-3">
-        <label for="id_payment_mode" class="col-sm-4 col-form-label">Payment mode</label>
-        <div class="col-sm-8">
-          <select name="payment_mode" class="select form-control" required="" id="id_payment_mode"> 
-            <option value="" selected="">Choose...</option> <option value="cash">Cash</option> 
-            <option value="credit">Credit</option> <option value="upi">UPI</option>
-        </select> 
-        </div>
-      </div>
+      
       <div class="card">
         <div class="card-header">
           Items
@@ -59,8 +51,33 @@
             <tbody id="id_items">
             </tbody>
           </table>
+          <p class="lead">Total: <span id="id_total">0</span>.00 rs</p>
         </div>
       </div>
+      <br>
+      <div class="row mb-3">
+        <label for="id_payment_mode" class="col-sm-4 col-form-label">Payment mode</label>
+        <div class="col-sm-8">
+          <select name="payment_mode" class="select form-control" required="" id="id_payment_mode"> 
+            <option value="" selected="">Choose...</option> <option value="cash">Cash</option> 
+            <option value="credit">Credit</option> <option value="upi">UPI</option>
+        </select> 
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="id_payment_mode" class="col-sm-4 col-form-label">Date</label>
+        <div class="col-sm-8">
+          <input type="date" name="date_of_purchase" id="id_date_of_purchase" class="form-control">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label class="col-sm-4 col-form-label">Payment</label>
+        <div class="col-sm-8">
+          <input class="form-control" name="payment" id="id_payment">
+        </div>
+      </div>
+
+      
       <hr>
       <div class="d-grid gap-2 d-md-flex justify-content-md-end">
         <button class="btn btn-primary btn-lg" type="button" id="id_save_entry">Save Entry</button>
@@ -116,15 +133,15 @@
     $("#id_buyer").select2();
     $("#id_product").select2();
     var items = [];
+    var total = 0;
 
     $("#btn_edit_buyer").click(function (e) {
       let buyer_id = $("#id_buyer").val();
       if (buyer_id) {
         $.get(`/buyer/edit/${buyer_id}/`, function( data ) {
           $("#edit_buyer_body").html(data);
-        $("#editModal").modal('show');
+          $("#editModal").modal('show');
         });
-        
       } else {
         alert('Please select a buyer.')
       }
@@ -134,6 +151,8 @@
       let data = {
         'buyerid':$("#id_buyer").val(),
         'paymentmode':$("#id_payment_mode").val(),
+        'date_purchase':$("#id_date_of_purchase").val(),
+        'payment':$("#id_payment").val(),
         'items':JSON.stringify(items)
       };
       if(data['buyerid'] && data['paymentmode']&& items.length>0) {
@@ -159,9 +178,10 @@
         'productid':$("#id_product").val(),
         'unittype':$("#id_unit_type").val(),
         'unitprice':$( "#id_unit_price" ).val(),
-        'labour':$("#id_labour_commn" ).val()
+        'labour':$("#id_labour_commn" ).val(),
+        'hamali':$("#id_hamali" ).val(),
       }
-      if(selected['productid'] && selected['unittype']&& selected['unitprice']&& selected['labour']) {
+      if(selected['productid'] && selected['unittype']&& selected['unitprice']&& selected['labour']&& selected['hamali']) {
         items.push(selected);
         $("#id_items").append(
           '<tr><td>'+ items.length + '</td><td>' +
@@ -169,6 +189,8 @@
             $("#id_unit_price").val()+ '.00rs/'+ $("#id_unit_type option:selected" ).text()+'</td><td>' +
             $("#id_labour_commn").val()+ '.00rs</td></tr>'
         );
+        total = total + Number(selected['unitprice']) + Number(selected['labour']);
+        $("#id_total").html(total);
         $('form').trigger("reset");
         $('#id_product').val(null).trigger('change');
       } else {

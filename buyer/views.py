@@ -2,17 +2,16 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum, Max, F
+from django.db.models import Sum, Max, F, Window, Case, When, IntegerField
 from django.views.generic.edit import UpdateView
 from django.template.loader import render_to_string
+from django.middleware import csrf
 
 import json
 
-
-
 from buyer.pdf import GeneratePDF
 from buyer.forms import BuyerForm, BuyerEntryForm
-from buyer.models import Buyer, BuyerEntry, BuyerEntryItems
+from buyer.models import Buyer, BuyerEntry, BuyerEntryItems, Accounting
 
 @login_required
 def buyers_view(request):
@@ -24,11 +23,11 @@ def buyers_view(request):
             messages.success(request, 'Buyer saved with success!')
             return redirect('buyer:entry')
 
-class BuyerUpdateView(UpdateView):
-    model = Buyer
-    form_class = BuyerForm
-    template_name_suffix = '_update_form'
-from django.middleware import csrf
+# class BuyerUpdateView(UpdateView):
+#     model = Buyer
+#     form_class = BuyerForm
+#     template_name_suffix = '_update_form'
+
 def buyer_update_view(request,pk):
     item= Buyer.objects.get(id=pk)
     if request.method =='POST':
@@ -57,8 +56,10 @@ def entry_view(request):
         entry=BuyerEntry.objects.create(
             billnumber= billno+1,
             buyer_id=request.POST['buyerid'],
-            payment_mode=request.POST['paymentmode']
+            payment_mode=request.POST['paymentmode'],
+            date_of_purchase = request.POST['date_purchase']
         )
+        
         items = json.loads(request.POST['items'])
         for item in items:
             BuyerEntryItems.objects.create(
@@ -67,9 +68,16 @@ def entry_view(request):
                 product_id=item['productid'],
                 unit_type=item['unittype'],
                 unit_price=item['unitprice'],
+                hamali=item['hamali'],
             )
         
+        Accounting.objects.create(buyer_id=request.POST['buyerid'],is_credit=False, 
+            amount=BuyerEntryItems.objects.filter(
+                buyer_entry=entry
+            ).aggregate(total=Sum(F('unit_price')+F('labour_commn')))['total'])
         
+        Accounting.objects.create(buyer_id=request.POST['buyerid'],is_credit=True, 
+            amount=request.POST['payment'])
         messages.success(request, 'Entry saved with success!')
         pdf_url = generate_pdf(entry,request)
         return HttpResponse(pdf_url)
@@ -79,6 +87,31 @@ def ajax_pdf(request):
     entry=BuyerEntry.objects.get(id=request.GET['entry'])
     pdf_url = generate_pdf(entry,request)
     return HttpResponse(pdf_url)
+
+def accounting_view(request):
+    if request.method == 'POST':
+        # date_purchase = request.POST['date_purchase']
+        Accounting.objects.create(buyer_id=request.POST['buyerid'],is_credit=True, 
+            amount=request.POST['payment'])
+        return HttpResponse('success')
+
+    resp = {'buyers':Buyer.objects.all(), 'accountings': None}
+    att_buyer = request.GET.get('buyer','')
+    if att_buyer:
+        resp['att_buyer'] = int(att_buyer)
+        resp['accountings']=Accounting.objects.filter(buyer_id=att_buyer).annotate(
+            cust_amount = Case(
+                When(is_credit=False, then=-F('amount')),
+                default=F('amount'),
+                output_field=IntegerField()
+            )
+        ).annotate(
+            balance=Window(
+                Sum('cust_amount'), 
+                order_by=F('date_of_entered').asc(),
+            )).order_by('-date_of_entered')
+
+    return render(request,"buyer/accounting.html",resp)
 
 @login_required
 def entrylist_view(request):
